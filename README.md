@@ -8,7 +8,7 @@ The app makes **no network requests at all** — there is no sync, no account, n
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/arvinpaundra/authd/master/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/arvinpaundra/authd/main/install.sh | bash
 ```
 
 Verifies the release SHA-256 and installs `Authd.app` into `~/Applications`, no sudo. Pin a version

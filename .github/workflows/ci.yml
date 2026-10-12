@@ -4,7 +4,7 @@ name: CI
 # nothing meaningful to check on another runner yet.
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

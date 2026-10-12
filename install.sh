@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # authd installer — downloads a release, verifies its SHA-256, installs Authd.app.
 #
-#   curl -fsSL https://raw.githubusercontent.com/arvinpaundra/authd/master/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/arvinpaundra/authd/main/install.sh | bash
 #   curl -fsSL …/install.sh | bash -s -- 0.1.0        # a specific version
 #   curl -fsSL …/install.sh | bash -s -- --uninstall
 #
