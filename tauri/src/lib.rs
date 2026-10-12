@@ -7,7 +7,7 @@ mod store;
 
 use std::fs;
 
-use tauri::{Manager, WindowEvent};
+use tauri::{Manager, RunEvent, WindowEvent};
 use tauri_plugin_autostart::ManagerExt;
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
@@ -93,15 +93,28 @@ fn export_links(app: tauri::AppHandle, text: String) -> Result<String, String> {
     Ok(path.display().to_string())
 }
 
+/// Passed by the login item, so a launch at boot can tell itself apart from a launch by hand.
+const HIDDEN_FLAG: &str = "--hidden";
+
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             // macOS routes ⌘C/⌘V through the menu, so the webview needs one to paste at all
             app.set_menu(tauri::menu::Menu::default(app.handle())?)?;
+            // Launched at login it stays out of the way: the shortcut is the point, not the window.
+            if !std::env::args().any(|arg| arg == HIDDEN_FLAG) {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                }
+            }
             Ok(())
         })
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_autostart::Builder::new().build())
+        .plugin(
+            tauri_plugin_autostart::Builder::new()
+                .arg(HIDDEN_FLAG)
+                .build(),
+        )
         .plugin(tauri_plugin_clipboard_manager::init())
         .invoke_handler(tauri::generate_handler![
             vault_load,
@@ -114,13 +127,26 @@ pub fn run() {
             set_autostart,
             export_links
         ])
-        .on_window_event(|window, event| {
-            if window.label() == "panel" {
-                if let WindowEvent::Focused(false) = event {
-                    let _ = window.hide();
+        .on_window_event(|window, event| match (window.label(), event) {
+            ("panel", WindowEvent::Focused(false)) => {
+                let _ = window.hide();
+            }
+            // Closing the main window only puts it away: the shortcut has to keep working.
+            ("main", WindowEvent::CloseRequested { api, .. }) => {
+                api.prevent_close();
+                let _ = window.hide();
+            }
+            _ => {}
+        })
+        .build(tauri::generate_context!())
+        .expect("authd failed to start")
+        .run(|app, event| {
+            // clicking the Dock icon with no window on screen
+            if let RunEvent::Reopen { .. } = event {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
                 }
             }
-        })
-        .run(tauri::generate_context!())
-        .expect("authd failed to start");
+        });
 }

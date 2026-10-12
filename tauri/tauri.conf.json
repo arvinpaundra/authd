@@ -18,6 +18,7 @@
       {
         "label": "main",
         "title": "Authd",
+        "visible": false,
         "width": 380,
         "height": 430,
         "minWidth": 340,

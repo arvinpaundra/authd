@@ -83,7 +83,9 @@ preview.html   the design reference, a standalone page with no dependencies
 ```
 
 Two npm packages, neither at runtime; five cargo crates. No framework, no state library, no CSS
-framework. See `HANDOFF.md` for why each one is there and what was deliberately left out.
+framework. A dependency has to beat the inline version on correctness, not on convenience — TOTP is
+WebCrypto plus 15 lines of base32, the Google Authenticator export is decoded by hand instead of
+pulling in protobufjs, and QR reading is Vision rather than jsQR.
 
 ## Release
 

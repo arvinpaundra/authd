@@ -73,7 +73,8 @@ const rowHTML = (a: Account, i: number): string =>
       `<button class="del" data-act="del" title="Remove">${ICON.remove}</button></div>`) +
   `<div class="face"><div class="mono">${a.issuer.slice(0, 1).toUpperCase() || "?"}</div>` +
   `<div class="meta"><div class="name"></div><div class="sub"></div></div>` +
-  `<div class="right"><div class="code" data-code>······</div><div class="ring" data-ring></div></div></div></div>`
+  `<div class="right"><div class="code" data-code>${"•".repeat(a.digits)}</div>` +
+  `<div class="dots">${"•".repeat(a.digits)}</div><div class="ring" data-ring></div></div></div></div>`
 
 const render = (): void => {
   openRow = null
@@ -104,11 +105,9 @@ const tick = async (): Promise<void> => {
     if (!a) continue
     const left = secondsLeft(now, a.period)
     const soon = left < 5
-    const face = el(".face", row)!
     const digits = await code(a.secret, a.period, a.digits, now)
     const out = el(".code", row)!
-    out.textContent =
-      vault.settings.mask && !face.matches(":hover") ? "•".repeat(a.digits) : digits.replace(/(.{3})(?=.)/g, "$1 ")
+    out.textContent = digits.replace(/(.{3})(?=.)/g, "$1 ")
     out.classList.toggle("soon", soon)
     const ring = el(".ring", row)!
     ring.style.setProperty("--p", (left / a.period).toFixed(3))
@@ -264,6 +263,7 @@ const paintClipboard = (): void => {
 const paintSettings = (): void => {
   const { mask, shortcut, autostart, clipboardSeconds } = vault.settings
   $<HTMLInputElement>("sw-mask").checked = mask
+  document.body.classList.toggle("masked", mask)
   $<HTMLInputElement>("sw-login").checked = autostart
   $("rec").textContent = display(shortcut)
   $<HTMLInputElement>("clip").value = String(clipboardSeconds)
@@ -442,8 +442,8 @@ const installCard = (): void => {
   // ---- settings ----
   $<HTMLInputElement>("sw-mask").onchange = (e) => {
     vault.settings.mask = (e.target as HTMLInputElement).checked
+    document.body.classList.toggle("masked", vault.settings.mask)
     persist()
-    void tick()
   }
   $<HTMLInputElement>("sw-login").onchange = async (e) => {
     const on = (e.target as HTMLInputElement).checked
@@ -534,6 +534,7 @@ const start = async (): Promise<void> => {
     toast(`Could not read the vault: ${error instanceof Error ? error.message : String(error)}`)
     return // leave the list empty rather than overwrite a vault we failed to parse
   }
+  document.body.classList.toggle("masked", vault.settings.mask)
   if (PANEL) installPanel()
   else {
     installCard()

@@ -116,6 +116,12 @@
     font-variant-numeric:tabular-nums;transition:color .3s;
   }
   .code.soon{color:var(--warn)}
+  /* masking is CSS only: hover reveals at once instead of waiting for the next redraw */
+  .dots{display:none;font:700 16px/1 ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:1.2px;color:var(--ink-3)}
+  body.masked .code{display:none}
+  body.masked .dots{display:block}
+  body.masked .face:hover .code{display:block}
+  body.masked .face:hover .dots{display:none}
   /* determinate arc, float's conic + mask trick */
   .ring{
     width:20px;height:20px;flex:0 0 20px;border-radius:50%;
