@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Authd",
+  "version": "0.0.0",
+  "identifier": "dev.authd.app",
+  "build": {
+    "frontendDist": "../ui/src",
+    "beforeBuildCommand": {
+      "script": "bun run build",
+      "cwd": ".."
+    }
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": false,
+    "security": { "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'" },
+    "windows": [
+      {
+        "label": "main",
+        "title": "Authd",
+        "width": 380,
+        "height": 430,
+        "minWidth": 340,
+        "minHeight": 260,
+        "resizable": true,
+        "titleBarStyle": "Overlay",
+        "backgroundColor": "#FFFFFF",
+        "hiddenTitle": true
+      },
+      {
+        "label": "panel",
+        "url": "index.html?panel",
+        "width": 330,
+        "height": 460,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "category": "Utility",
+    "shortDescription": "TOTP codes on the desktop",
+    "longDescription": "A desktop TOTP client for macOS. Keys live in the Keychain, codes are never written to disk, and nothing ever leaves the machine.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.png"],
+    "macOS": { "minimumSystemVersion": "14.0", "signingIdentity": "-" }
+  }
+}

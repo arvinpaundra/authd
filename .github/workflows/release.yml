@@ -1,0 +1,49 @@
+name: Release
+
+# Releasing is one command:  git tag v0.1.0 && git push origin v0.1.0
+# The tag IS the version — nothing in the repo stores it.
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build and publish, e.g. 0.1.0
+        required: true
+
+permissions:
+  contents: write # gh release create
+
+env:
+  BUN_VERSION: 1.3.10
+  # tag run → refs/tags/v0.1.0 → 0.1.0; manual run → the version you typed
+  VERSION: ${{ inputs.version || github.ref_name }}
+
+jobs:
+  macos:
+    runs-on: macos-15 # Apple Silicon runner; the x86_64 target is added for the universal build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tauri
+
+      # Same script as a local release: checks, universal build, zip + dmg + manifest.
+      - run: scripts/release.sh --version "${VERSION#v}"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v${VERSION#v}" dist/v${VERSION#v}/* --title "v${VERSION#v}" --generate-notes
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-macos
+          path: dist/v*/*
+          retention-days: 7

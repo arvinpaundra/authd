@@ -1,0 +1,24 @@
+[package]
+name = "authd"
+version = "0.0.0" # placeholder: releases take their version from the git tag
+description = "TOTP codes on the desktop"
+edition = "2021"
+
+[lib]
+name = "authd_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["macos-private-api"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-autostart = "2"
+keyring = { version = "3", features = ["apple-native", "sync-secret-service", "windows-native"] }
+tauri-plugin-clipboard-manager = "2.4.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-foundation = { version = "0.3", features = ["NSData", "NSArray", "NSDictionary", "NSString", "NSValue", "NSError"] }
+objc2-vision = { version = "0.3", features = ["VNRequest", "VNDetectBarcodesRequest", "VNObservation", "VNRequestHandler", "VNTypes", "VNDefines"] }

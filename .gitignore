@@ -1,0 +1,10 @@
+# build output
+tauri/target/
+tauri/gen/
+node_modules/
+ui/src/js/
+
+.DS_Store
+
+# release artifacts (scripts/release.sh)
+dist/
