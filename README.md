@@ -99,6 +99,10 @@ The tag is the version — nothing in the repo stores it. CI builds a universal 
 Builds are **ad-hoc signed, not notarised**, so the installer strips the quarantine flag. Sign properly
 with `scripts/release.sh --sign "Developer ID Application: … (TEAMID)"`.
 
+## Licence
+
+MIT. See [LICENSE](LICENSE).
+
 ## Known limits
 
 - Seeds cannot be read out of a Google account. Only the one-time export QR works.
