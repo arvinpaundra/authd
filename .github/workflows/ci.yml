@@ -30,6 +30,8 @@ jobs:
       - run: bun run typecheck
       - run: bun run test
       - run: bun run build # the Rust build embeds ui/src, so the bundle has to exist first
+      # the tauri CLI refuses to build when the npm and crate minor versions differ
+      - run: bun run tauri info | grep -q "Found version mismatched" && exit 1 || true
 
       - run: cargo fmt --check
         working-directory: tauri
